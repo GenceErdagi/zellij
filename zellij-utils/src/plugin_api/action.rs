@@ -755,6 +755,10 @@ impl TryFrom<ProtobufAction> for Action {
                 Some(_) => Err("NextSwapLayout should not have a payload"),
                 None => Ok(Action::NextSwapLayout),
             },
+            Some(ProtobufActionName::GoToSwapLayout) => match protobuf_action.optional_payload {
+                Some(OptionalPayload::GoToSwapLayoutPayload(name)) => Ok(Action::GoToSwapLayout { name }),
+                _ => Err("Mismatched payload for GoToSwapLayout"),
+            },
             Some(ProtobufActionName::OverrideLayout) => match protobuf_action.optional_payload {
                 Some(OptionalPayload::OverrideLayoutPayload(payload)) => {
                     Ok(Action::OverrideLayout {
@@ -1090,6 +1094,7 @@ impl TryFrom<Action> for ProtobufAction {
             | Action::ToggleFloatingPanesByTabId { .. }
             | Action::PreviousSwapLayoutByTabId { .. }
             | Action::NextSwapLayoutByTabId { .. }
+            | Action::GoToSwapLayoutByTabId { .. }
             | Action::MoveTabByTabId { .. } => {
                 Err("These are CLI-only actions, not available in keybindings")
             },
@@ -1619,6 +1624,10 @@ impl TryFrom<Action> for ProtobufAction {
             Action::NextSwapLayout => Ok(ProtobufAction {
                 name: ProtobufActionName::NextSwapLayout as i32,
                 optional_payload: None,
+            }),
+            Action::GoToSwapLayout { name } => Ok(ProtobufAction {
+                name: ProtobufActionName::GoToSwapLayout as i32,
+                optional_payload: Some(OptionalPayload::GoToSwapLayoutPayload(name)),
             }),
             Action::OverrideLayout {
                 tabs,

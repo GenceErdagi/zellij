@@ -1036,6 +1036,25 @@ impl Tab {
             .with_context(|| format!("failed to apply cached resizes"))?;
         Ok(())
     }
+    pub fn go_to_swap_layout(&mut self, name: String) -> Result<()> {
+        if self.floating_panes.panes_are_visible() {
+            self.swap_layouts.set_floating_layout_by_name(&name);
+            self.relayout_floating_panes(false)?;
+            let (current_layout, _) = self.swap_layouts.floating_layout_info();
+            if current_layout.as_ref().map(|s| s.as_str()).unwrap_or("") != name {
+                log::warn!("Swap layout '{}' not found in floating layouts", name);
+            }
+        } else {
+            self.swap_layouts.set_tiled_layout_by_name(&name);
+            self.relayout_tiled_panes(false)?;
+            let (current_layout, _) = self.swap_layouts.tiled_layout_info();
+            if current_layout.as_ref().map(|s| s.as_str()).unwrap_or("") != name {
+                log::warn!("Swap layout '{}' not found in tiled layouts", name);
+            }
+        }
+        Ok(())
+    }
+
     fn relayout_tiled_panes(&mut self, search_backwards: bool) -> Result<()> {
         if self.tiled_panes.fullscreen_is_active() {
             self.tiled_panes.unset_fullscreen();

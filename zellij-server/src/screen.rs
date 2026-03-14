@@ -446,6 +446,7 @@ pub enum ScreenInstruction {
     SetTabBellFlash(usize, bool), // tab_id, is_flashing
     PreviousSwapLayout(ClientId, Option<NotificationEnd>),
     NextSwapLayout(ClientId, Option<NotificationEnd>),
+    GoToSwapLayout(String, ClientId, Option<NotificationEnd>),
     OverrideLayout(
         Option<PathBuf>,        // cwd (applies to all tabs)
         Option<TerminalAction>, // default_shell (applies to all tabs)
@@ -726,6 +727,7 @@ pub enum ScreenInstruction {
     ToggleFloatingPanesWithTabId(usize, Option<TerminalAction>, Option<NotificationEnd>),
     PreviousSwapLayoutWithTabId(usize, Option<NotificationEnd>),
     NextSwapLayoutWithTabId(usize, Option<NotificationEnd>),
+    GoToSwapLayoutWithTabId(usize, String, Option<NotificationEnd>),
     MoveTabWithTabId(usize, Direction, Option<NotificationEnd>),
 }
 
@@ -875,6 +877,7 @@ impl From<&ScreenInstruction> for ScreenContext {
             ScreenInstruction::SetTabBellFlash(..) => ScreenContext::SetTabBellFlash,
             ScreenInstruction::PreviousSwapLayout(..) => ScreenContext::PreviousSwapLayout,
             ScreenInstruction::NextSwapLayout(..) => ScreenContext::NextSwapLayout,
+            ScreenInstruction::GoToSwapLayout(..) => ScreenContext::GoToSwapLayout,
             ScreenInstruction::OverrideLayout(..) => ScreenContext::OverrideLayout,
             ScreenInstruction::OverrideLayoutComplete(..) => ScreenContext::OverrideLayoutComplete,
             ScreenInstruction::QueryTabNames(..) => ScreenContext::QueryTabNames,
@@ -1055,6 +1058,9 @@ impl From<&ScreenInstruction> for ScreenContext {
             },
             ScreenInstruction::NextSwapLayoutWithTabId(..) => {
                 ScreenContext::NextSwapLayoutWithTabId
+            },
+            ScreenInstruction::GoToSwapLayoutWithTabId(..) => {
+                ScreenContext::GoToSwapLayoutWithTabId
             },
             ScreenInstruction::MoveTabWithTabId(..) => ScreenContext::MoveTabWithTabId,
         }
@@ -6492,6 +6498,21 @@ pub(crate) fn screen_thread_main(
                 screen.render(None)?;
                 screen.log_and_report_session_state()?;
             },
+            ScreenInstruction::GoToSwapLayout(
+                name,
+                client_id,
+                _completion_tx, // the action ends here, dropping this will release anything
+                                // waiting for it
+            ) => {
+                active_tab_and_connected_client_id!(
+                    screen,
+                    client_id,
+                    |tab: &mut Tab, _client_id: ClientId| tab.go_to_swap_layout(name.clone()),
+                    ?
+                );
+                screen.render(None)?;
+                screen.log_and_report_session_state()?;
+            },
             ScreenInstruction::OverrideLayout(
                 cwd,
                 default_shell,
@@ -8652,6 +8673,19 @@ pub(crate) fn screen_thread_main(
             ScreenInstruction::NextSwapLayoutWithTabId(tab_id, mut _completion_tx) => {
                 if let Some(tab) = screen.tabs.get_mut(&tab_id) {
                     tab.next_swap_layout().non_fatal();
+                } else {
+                    log::error!("Tab with id {} not found", tab_id);
+                    if let Some(ref mut c) = _completion_tx {
+                        c.set_exit_status(1);
+                        c.set_error_message(format!("Tab with id {} not found", tab_id));
+                    }
+                }
+                screen.render(None)?;
+                screen.log_and_report_session_state()?;
+            },
+            ScreenInstruction::GoToSwapLayoutWithTabId(tab_id, name, mut _completion_tx) => {
+                if let Some(tab) = screen.tabs.get_mut(&tab_id) {
+                    tab.go_to_swap_layout(name).non_fatal();
                 } else {
                     log::error!("Tab with id {} not found", tab_id);
                     if let Some(ref mut c) = _completion_tx {

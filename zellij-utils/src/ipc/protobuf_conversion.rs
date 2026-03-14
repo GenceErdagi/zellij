@@ -810,6 +810,8 @@ impl From<crate::input::actions::Action>
             FocusTerminalPaneWithIdAction,
             GoToNextTabAction,
             GoToPreviousTabAction,
+            GoToSwapLayoutAction,
+            GoToSwapLayoutByTabIdAction,
             GoToTabAction,
             GoToTabByIdAction,
             GoToTabNameAction,
@@ -1324,6 +1326,9 @@ impl From<crate::input::actions::Action>
             crate::input::actions::Action::NextSwapLayout => {
                 ActionType::NextSwapLayout(NextSwapLayoutAction {})
             },
+            crate::input::actions::Action::GoToSwapLayout { name } => {
+                ActionType::GoToSwapLayout(GoToSwapLayoutAction { name })
+            },
             crate::input::actions::Action::OverrideLayout {
                 tabs,
                 retain_existing_terminal_panes,
@@ -1701,6 +1706,9 @@ impl From<crate::input::actions::Action>
             },
             crate::input::actions::Action::NextSwapLayoutByTabId { id } => {
                 ActionType::NextSwapLayoutByTabId(NextSwapLayoutByTabIdAction { id })
+            },
+            crate::input::actions::Action::GoToSwapLayoutByTabId { id, name } => {
+                ActionType::GoToSwapLayoutByTabId(GoToSwapLayoutByTabIdAction { id, name })
             },
             crate::input::actions::Action::MoveTabByTabId { id, direction } => {
                 ActionType::MoveTabByTabId(MoveTabByTabIdAction {
@@ -2151,6 +2159,11 @@ impl TryFrom<crate::client_server_contract::client_server_contract::Action>
                 Ok(crate::input::actions::Action::PreviousSwapLayout)
             },
             ActionType::NextSwapLayout(_) => Ok(crate::input::actions::Action::NextSwapLayout),
+            ActionType::GoToSwapLayout(go_to_swap_layout_action) => {
+                Ok(crate::input::actions::Action::GoToSwapLayout {
+                    name: go_to_swap_layout_action.name,
+                })
+            },
             ActionType::OverrideLayout(override_layout_action) => {
                 Ok(crate::input::actions::Action::OverrideLayout {
                     tabs: override_layout_action
@@ -2599,6 +2612,12 @@ impl TryFrom<crate::client_server_contract::client_server_contract::Action>
             },
             ActionType::NextSwapLayoutByTabId(a) => {
                 Ok(crate::input::actions::Action::NextSwapLayoutByTabId { id: a.id })
+            },
+            ActionType::GoToSwapLayoutByTabId(a) => {
+                Ok(crate::input::actions::Action::GoToSwapLayoutByTabId {
+                    id: a.id,
+                    name: a.name,
+                })
             },
             ActionType::MoveTabByTabId(a) => {
                 let direction = proto_i32_to_direction(a.direction)?;

@@ -244,6 +244,7 @@ message Action {
     TabIdAndName rename_tab_by_id_payload = 57;
     ShowFloatingPanesPayload show_floating_panes_payload = 58;
     HideFloatingPanesPayload hide_floating_panes_payload = 59;
+    string go_to_swap_layout_payload = 60;
   }
 }
 
@@ -483,6 +484,7 @@ enum ActionName {
     RenameTabById = 97;
     ShowFloatingPanes = 98;
     HideFloatingPanes = 99;
+    GoToSwapLayout = 100;
 }
 
 message Position {

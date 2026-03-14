@@ -203,6 +203,7 @@ message Action {
     ToggleMouseModeAction toggle_mouse_mode = 65;
     PreviousSwapLayoutAction previous_swap_layout = 66;
     NextSwapLayoutAction next_swap_layout = 67;
+    GoToSwapLayoutAction go_to_swap_layout = 135;
     QueryTabNamesAction query_tab_names = 68;
     NewTiledPluginPaneAction new_tiled_plugin_pane = 69;
     NewFloatingPluginPaneAction new_floating_plugin_pane = 70;
@@ -272,6 +273,7 @@ message Action {
     PreviousSwapLayoutByTabIdAction previous_swap_layout_by_tab_id = 132;
     NextSwapLayoutByTabIdAction next_swap_layout_by_tab_id = 133;
     MoveTabByTabIdAction move_tab_by_tab_id = 134;
+    GoToSwapLayoutByTabIdAction go_to_swap_layout_by_tab_id = 149;
   }
 }
 
@@ -321,6 +323,9 @@ message DenyAction {}
 message ToggleMouseModeAction {}
 message PreviousSwapLayoutAction {}
 message NextSwapLayoutAction {}
+message GoToSwapLayoutAction {
+  string name = 1;
+}
 message TabLayoutInfo {
   uint32 tab_index = 1;
   optional string tab_name = 2;
@@ -1201,4 +1206,5 @@ message ToggleActiveSyncTabByTabIdAction { uint64 id = 1; }
 message ToggleFloatingPanesByTabIdAction { uint64 id = 1; }
 message PreviousSwapLayoutByTabIdAction { uint64 id = 1; }
 message NextSwapLayoutByTabIdAction { uint64 id = 1; }
+message GoToSwapLayoutByTabIdAction { uint64 id = 1; string name = 2; }
 message MoveTabByTabIdAction { uint64 id = 1; Direction direction = 2; }

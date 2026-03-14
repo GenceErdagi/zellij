@@ -1306,6 +1306,14 @@ pub fn next_swap_layout() {
     unsafe { host_run_plugin_command() };
 }
 
+/// Change to a specific [swap layout](https://zellij.dev/documentation/swap-layouts.html) by name
+pub fn go_to_swap_layout(name: &str) {
+    let plugin_command = PluginCommand::GoToSwapLayout(name.to_owned());
+    let protobuf_plugin_command: ProtobufPluginCommand = plugin_command.try_into().unwrap();
+    object_to_stdout(&protobuf_plugin_command.encode_to_vec());
+    unsafe { host_run_plugin_command() };
+}
+
 /// Change focus to the tab with the specified name
 pub fn go_to_tab_name(tab_name: &str) {
     let plugin_command = PluginCommand::GoToTabName(tab_name.to_owned());

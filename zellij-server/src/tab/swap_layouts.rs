@@ -288,4 +288,30 @@ impl SwapLayouts {
         }
         None
     }
+    pub fn set_tiled_layout_by_name(&mut self, name: &str) {
+        if name.is_empty() {
+            return;
+        }
+        for (index, swap_layout) in self.swap_tiled_layouts.iter().enumerate() {
+            let layout_name = swap_layout.1.as_deref().unwrap_or("");
+            if layout_name == name {
+                self.current_tiled_layout_position = index;
+                self.is_tiled_damaged = true;
+                return;
+            }
+        }
+    }
+    pub fn set_floating_layout_by_name(&mut self, name: &str) {
+        if name.is_empty() {
+            return;
+        }
+        for (index, swap_layout) in self.swap_floating_layouts.iter().enumerate() {
+            let layout_name = swap_layout.1.as_deref().unwrap_or("");
+            if layout_name == name {
+                self.current_floating_layout_position = index;
+                self.is_floating_damaged = true;
+                return;
+            }
+        }
+    }
 }

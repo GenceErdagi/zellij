@@ -81,6 +81,26 @@ macro_rules! parse_kdl_action_arguments {
                 "ToggleMouseMode" => Ok(Action::ToggleMouseMode),
                 "PreviousSwapLayout" => Ok(Action::PreviousSwapLayout),
                 "NextSwapLayout" => Ok(Action::NextSwapLayout),
+                "GoToSwapLayout" => {
+                    let name = $action_node
+                        .get(0)
+                        .and_then(|v| v.value().as_string())
+                        .ok_or_else(|| ConfigError::new_kdl_error("Missing layout name".into(), $action_node.span().offset(), $action_node.span().len()))?
+                        .to_string();
+                    Ok(Action::GoToSwapLayout { name })
+                },
+                "GoToSwapLayoutByTabId" => {
+                    let id = $action_node
+                        .get(0)
+                        .and_then(|v| v.value().as_i64())
+                        .ok_or_else(|| ConfigError::new_kdl_error("Missing tab id".into(), $action_node.span().offset(), $action_node.span().len()))? as u64;
+                    let name = $action_node
+                        .get(1)
+                        .and_then(|v| v.value().as_string())
+                        .ok_or_else(|| ConfigError::new_kdl_error("Missing layout name".into(), $action_node.span().offset(), $action_node.span().len()))?
+                        .to_string();
+                    Ok(Action::GoToSwapLayoutByTabId { id, name })
+                },
                 "Clear" => Ok(Action::ClearScreen),
                 _ => Err(ConfigError::new_kdl_error(
                     format!("Unsupported action: {:?}", $action_name),
@@ -1222,6 +1242,17 @@ impl Action {
             Action::ToggleMouseMode => Some(KdlNode::new("ToggleMouseMode")),
             Action::PreviousSwapLayout => Some(KdlNode::new("PreviousSwapLayout")),
             Action::NextSwapLayout => Some(KdlNode::new("NextSwapLayout")),
+            Action::GoToSwapLayout { name } => {
+                let mut node = KdlNode::new("GoToSwapLayout");
+                node.push(name.as_str());
+                Some(node)
+            },
+            Action::GoToSwapLayoutByTabId { id, name } => {
+                let mut node = KdlNode::new("GoToSwapLayoutByTabId");
+                node.push(*id as i64);
+                node.push(name.as_str());
+                Some(node)
+            },
             Action::BreakPane => Some(KdlNode::new("BreakPane")),
             Action::BreakPaneRight => Some(KdlNode::new("BreakPaneRight")),
             Action::BreakPaneLeft => Some(KdlNode::new("BreakPaneLeft")),
@@ -2116,6 +2147,8 @@ impl TryFrom<(&KdlNode, &Options)> for Action {
             },
             "PreviousSwapLayout" => Ok(Action::PreviousSwapLayout),
             "NextSwapLayout" => Ok(Action::NextSwapLayout),
+            "GoToSwapLayout" => parse_kdl_action_arguments!(action_name, action_arguments, kdl_action),
+            "GoToSwapLayoutByTabId" => parse_kdl_action_arguments!(action_name, action_arguments, kdl_action),
             "BreakPane" => Ok(Action::BreakPane),
             "BreakPaneRight" => Ok(Action::BreakPaneRight),
             "BreakPaneLeft" => Ok(Action::BreakPaneLeft),

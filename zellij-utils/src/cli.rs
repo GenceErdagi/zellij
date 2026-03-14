@@ -1227,6 +1227,14 @@ pub enum CliAction {
         #[clap(short, long, value_parser)]
         tab_id: Option<usize>,
     },
+    /// Swap to a specific layout by name
+    GoToSwapLayout {
+        /// The name of the layout to swap to
+        name: String,
+        /// Target a specific tab by ID
+        #[clap(short, long, value_parser)]
+        tab_id: Option<usize>,
+    },
     /// Override the layout of the active tab
     OverrideLayout {
         /// Path to the layout file

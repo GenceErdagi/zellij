@@ -67,6 +67,7 @@ enum CommandName {
   QuitZellij = 51;
   PreviousSwapLayout = 52;
   NextSwapLayout = 53;
+  GoToSwapLayout = 154;
   GoToTabName = 54;
   FocusOrCreateTab = 55;
   GoToTab = 56;
@@ -351,6 +352,7 @@ message PluginCommand {
     SetPaneColorPayload set_pane_color_payload = 157;
     SetPaneRegexHighlightsPayload set_pane_regex_highlights_payload = 158;
     ClearPaneHighlightsPayload clear_pane_highlights_payload = 159;
+    string go_to_swap_layout_payload = 160;
   }
 }
 

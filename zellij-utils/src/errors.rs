@@ -330,6 +330,7 @@ pub enum ScreenContext {
     SetTabBellFlash,
     PreviousSwapLayout,
     NextSwapLayout,
+    GoToSwapLayout,
     OverrideLayout,
     OverrideLayoutComplete,
     QueryTabNames,
@@ -444,6 +445,7 @@ pub enum ScreenContext {
     ToggleFloatingPanesWithTabId,
     PreviousSwapLayoutWithTabId,
     NextSwapLayoutWithTabId,
+    GoToSwapLayoutWithTabId,
     MoveTabWithTabId,
 }
 

@@ -334,6 +334,7 @@ fn host_run_plugin_command(mut caller: Caller<'_, PluginEnv>) {
                     PluginCommand::QuitZellij => quit_zellij(env),
                     PluginCommand::PreviousSwapLayout => previous_swap_layout(env),
                     PluginCommand::NextSwapLayout => next_swap_layout(env),
+                    PluginCommand::GoToSwapLayout(name) => go_to_swap_layout(env, name),
                     PluginCommand::GoToTabName(tab_name) => go_to_tab_name(env, tab_name),
                     PluginCommand::FocusOrCreateTab(tab_name) => focus_or_create_tab(env, tab_name),
                     PluginCommand::GoToTab(tab_index) => go_to_tab(env, tab_index),
@@ -3043,6 +3044,12 @@ fn next_swap_layout(env: &PluginEnv) {
     apply_action!(action, error_msg, env);
 }
 
+fn go_to_swap_layout(env: &PluginEnv, name: String) {
+    let error_msg = || format!("failed to switch swap layout in plugin {}", env.name());
+    let action = Action::GoToSwapLayout { name };
+    apply_action!(action, error_msg, env);
+}
+
 fn go_to_tab_name(env: &PluginEnv, tab_name: String) {
     let error_msg = || format!("failed to change tab in plugin {}", env.name());
     let create = false;
@@ -5071,6 +5078,7 @@ fn check_command_permission(
         | PluginCommand::QuitZellij
         | PluginCommand::PreviousSwapLayout
         | PluginCommand::NextSwapLayout
+        | PluginCommand::GoToSwapLayout(..)
         | PluginCommand::GoToTabName(..)
         | PluginCommand::FocusOrCreateTab(..)
         | PluginCommand::GoToTab(..)

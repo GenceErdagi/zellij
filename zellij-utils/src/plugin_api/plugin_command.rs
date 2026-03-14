@@ -977,6 +977,10 @@ impl TryFrom<ProtobufPluginCommand> for PluginCommand {
                 }
                 Ok(PluginCommand::NextSwapLayout)
             },
+            Some(CommandName::GoToSwapLayout) => match protobuf_plugin_command.payload {
+                Some(Payload::GoToSwapLayoutPayload(name)) => Ok(PluginCommand::GoToSwapLayout(name)),
+                _ => Err("Mismatched payload for GoToSwapLayout"),
+            },
             Some(CommandName::GoToTabName) => match protobuf_plugin_command.payload {
                 Some(Payload::GoToTabNamePayload(tab_name)) => {
                     Ok(PluginCommand::GoToTabName(tab_name))
@@ -2857,6 +2861,10 @@ impl TryFrom<PluginCommand> for ProtobufPluginCommand {
             PluginCommand::NextSwapLayout => Ok(ProtobufPluginCommand {
                 name: CommandName::NextSwapLayout as i32,
                 payload: None,
+            }),
+            PluginCommand::GoToSwapLayout(name) => Ok(ProtobufPluginCommand {
+                name: CommandName::GoToSwapLayout as i32,
+                payload: Some(Payload::GoToSwapLayoutPayload(name)),
             }),
             PluginCommand::GoToTabName(tab_name) => Ok(ProtobufPluginCommand {
                 name: CommandName::GoToTabName as i32,

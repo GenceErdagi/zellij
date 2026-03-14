@@ -394,6 +394,10 @@ pub enum Action {
     ToggleMouseMode,
     PreviousSwapLayout,
     NextSwapLayout,
+    /// Swap to a specific layout by name
+    GoToSwapLayout {
+        name: String,
+    },
     /// Override the layout of the active tab
     OverrideLayout {
         tabs: Vec<TabLayoutInfo>,
@@ -615,6 +619,10 @@ pub enum Action {
     },
     NextSwapLayoutByTabId {
         id: u64,
+    },
+    GoToSwapLayoutByTabId {
+        id: u64,
+        name: String,
     },
     MoveTabByTabId {
         id: u64,
@@ -1515,6 +1523,10 @@ impl Action {
             CliAction::NextSwapLayout { tab_id } => match tab_id {
                 Some(id) => Ok(vec![Action::NextSwapLayoutByTabId { id: id as u64 }]),
                 None => Ok(vec![Action::NextSwapLayout]),
+            },
+            CliAction::GoToSwapLayout { name, tab_id } => match tab_id {
+                Some(id) => Ok(vec![Action::GoToSwapLayoutByTabId { id: id as u64, name }]),
+                None => Ok(vec![Action::GoToSwapLayout { name }]),
             },
             CliAction::OverrideLayout {
                 layout,
